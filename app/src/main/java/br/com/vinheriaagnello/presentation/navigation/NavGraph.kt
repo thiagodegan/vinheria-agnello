@@ -15,6 +15,7 @@ import br.com.vinheriaagnello.presentation.product.ProductViewModelFactory
 import androidx.compose.runtime.collectAsState
 import br.com.vinheriaagnello.data.local.WineStoreDatabase
 import br.com.vinheriaagnello.data.repository.ProductRepository
+import br.com.vinheriaagnello.presentation.product.ProductDetailScreen
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
@@ -37,7 +38,9 @@ fun AppNavGraph(navController: NavHostController) {
             val products by viewModel.products.collectAsState()
             HomeScreen(
                 products = products, // depois integraremos com o ViewModel
-                onProductClick = { /* TODO */ },
+                onProductClick = { product ->
+                    navController.navigate("product/${product.id}")
+                },
                 onAddToCartClick = { /* TODO */ },
                 onGoToCartClick = { /* TODO */ },
                 onGoToAdminClick = {
@@ -45,9 +48,29 @@ fun AppNavGraph(navController: NavHostController) {
                 }
             )
         }
-        composable("product/{productId}") {
-            // TODO: Replace with ProductDetailScreen(productId)
+        composable("product/{productId}") { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId")?.toIntOrNull()
+
+            val context = LocalContext.current
+            val database = remember { br.com.vinheriaagnello.data.local.WineStoreDatabase.getDatabase(context) }
+            val repository = remember { br.com.vinheriaagnello.data.repository.ProductRepository(database.productDao()) }
+            val viewModel: ProductViewModel = viewModel(factory = ProductViewModelFactory(repository))
+
+            val products by viewModel.products.collectAsState()
+
+            val product = products.find { it.id == productId }
+
+            if (product != null) {
+                ProductDetailScreen(
+                    product = product,
+                    onAddToCartClick = { /* TODO: Implement add to cart */ },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
+
         composable("cart") {
             // TODO: Replace with CartScreen()
         }
