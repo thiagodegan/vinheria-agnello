@@ -5,10 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [ProductEntity::class], version = 1)
+@Database(entities = [ProductEntity::class, CartItemEntity::class], version = 2)
 abstract class WineStoreDatabase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao
+    abstract fun cartItemDao(): CartItemDao
 
     companion object {
         @Volatile
@@ -20,7 +21,7 @@ abstract class WineStoreDatabase : RoomDatabase() {
                     context.applicationContext,
                     WineStoreDatabase::class.java,
                     "wine_store_db"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 instance
             }

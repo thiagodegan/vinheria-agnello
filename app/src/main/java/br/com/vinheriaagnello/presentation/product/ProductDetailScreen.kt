@@ -34,13 +34,25 @@ fun ProductDetailScreen(
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            Text(text = product.name, style = MaterialTheme.typography.headlineMedium)
+            Text(
+                text = product.name,
+                style = MaterialTheme.typography.headlineMedium
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = product.description, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = product.description,
+                style = MaterialTheme.typography.bodyMedium
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Price: \$${product.price}", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = "Price: \$${product.price}",
+                style = MaterialTheme.typography.bodyMedium
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "In stock: ${product.quantity}", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = "In stock: ${product.quantity}",
+                style = MaterialTheme.typography.bodyMedium
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
