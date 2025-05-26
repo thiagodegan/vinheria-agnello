@@ -1,0 +1,29 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Android Studio Navigation Editor temp files
+.navigation/
+
+# Crashlytics and Fabric files
+crashlytics-build.properties
+
+# Kotlin
+*.kotlin_module
+
+# Log files
+*.log
