@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -15,7 +16,8 @@ fun ProductDetailScreen(
     product: ProductEntity,
     onAddToCartClick: (ProductEntity) -> Unit,
     onBackClick: () -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    onEditProductClick: (ProductEntity) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -24,6 +26,11 @@ fun ProductDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { onEditProductClick(product) }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Edit Product")
                     }
                 }
             )

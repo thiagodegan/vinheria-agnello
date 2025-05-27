@@ -21,6 +21,7 @@ import br.com.vinheriaagnello.presentation.cart.CartViewModel
 import br.com.vinheriaagnello.presentation.cart.CartScreen
 import br.com.vinheriaagnello.presentation.cart.CartViewModelFactory
 import br.com.vinheriaagnello.data.repository.CartRepository
+import br.com.vinheriaagnello.presentation.product.EditProductScreen
 import br.com.vinheriaagnello.presentation.product.ProductDetailScreen
 import kotlinx.coroutines.launch
 
@@ -118,6 +119,9 @@ fun AppNavGraph(navController: NavHostController) {
                         }
                     },
                     onBackClick = { navController.popBackStack() },
+                    onEditProductClick = { productToEdit ->
+                        navController.navigate("edit-product/${productToEdit.id}")
+                    },
                     snackbarHostState = snackbarHostState
                 )
             }
@@ -143,9 +147,27 @@ fun AppNavGraph(navController: NavHostController) {
                 }
             )
         }
-        composable("checkout") {
-            // TODO: Replace with CheckoutScreen()
+        composable("edit-product/{productId}") { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId")?.toIntOrNull()
+            val context = LocalContext.current
+            val database = remember { br.com.vinheriaagnello.data.local.WineStoreDatabase.getDatabase(context) }
+            val productRepository = remember { br.com.vinheriaagnello.data.repository.ProductRepository(database.productDao()) }
+            val productViewModel: ProductViewModel = viewModel(factory = ProductViewModelFactory(productRepository))
+
+            val products by productViewModel.products.collectAsState()
+            val product = products.find { it.id == productId }
+
+            if (product != null) {
+                EditProductScreen(
+                    product = product,
+                    onUpdateProduct = { updatedProduct ->
+                        productViewModel.update(updatedProduct)
+                    },
+                    onBack = { navController.popBackStack() }
+                )
+            }
         }
+
         composable("admin/add-product") {
             val context = LocalContext.current
             val database = remember { WineStoreDatabase.getDatabase(context) }
