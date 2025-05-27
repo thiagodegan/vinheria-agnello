@@ -3,12 +3,14 @@ package br.com.vinheriaagnello.presentation.cart
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import br.com.vinheriaagnello.data.local.CartItemEntity
 import br.com.vinheriaagnello.data.local.ProductEntity
@@ -90,14 +92,18 @@ fun CartScreen(
                             OutlinedTextField(
                                 value = item.quantityInCart.toString(),
                                 onValueChange = { value ->
-                                    val newQty = value.toIntOrNull() ?: item.quantityInCart
+                                    // Filtra apenas dígitos
+                                    val cleanInput = value.filter { it.isDigit() }
+                                    val newQty = cleanInput.toIntOrNull() ?: item.quantityInCart
+
                                     if (newQty in 1..item.stock) {
                                         val updatedItem = item.copy(quantityInCart = newQty)
                                         cartViewModel.update(updatedItem)
                                     }
                                 },
                                 label = { Text("Quantity") },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                             )
 
                             IconButton(onClick = { cartViewModel.delete(item) }) {
