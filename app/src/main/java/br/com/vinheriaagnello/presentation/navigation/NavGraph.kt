@@ -52,7 +52,7 @@ fun AppNavGraph(navController: NavHostController) {
             val scope = rememberCoroutineScope()
 
             HomeScreen(
-                products = products, // depois integraremos com o ViewModel
+                products = products,
                 onProductClick = { product ->
                     navController.navigate("product/${product.id}")
                 },
@@ -96,7 +96,11 @@ fun AppNavGraph(navController: NavHostController) {
             val products by productViewModel.products.collectAsState()
             val product = products.find { it.id == productId }
 
+            val snackbarHostState = remember { SnackbarHostState() }
+            val scope = rememberCoroutineScope()
+
             if (product != null) {
+
                 ProductDetailScreen(
                     product = product,
                     onAddToCartClick = { productToAdd ->
@@ -109,8 +113,12 @@ fun AppNavGraph(navController: NavHostController) {
                             quantityInCart = 1
                         )
                         cartViewModel.insert(cartItem)
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Added to cart!")
+                        }
                     },
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = { navController.popBackStack() },
+                    snackbarHostState = snackbarHostState
                 )
             }
         }

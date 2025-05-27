@@ -14,7 +14,8 @@ import br.com.vinheriaagnello.data.local.ProductEntity
 fun ProductDetailScreen(
     product: ProductEntity,
     onAddToCartClick: (ProductEntity) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    snackbarHostState: SnackbarHostState
 ) {
     Scaffold(
         topBar = {
@@ -26,7 +27,8 @@ fun ProductDetailScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
