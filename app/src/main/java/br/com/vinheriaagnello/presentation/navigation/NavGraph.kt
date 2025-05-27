@@ -1,5 +1,6 @@
 package br.com.vinheriaagnello.presentation.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -13,12 +14,15 @@ import br.com.vinheriaagnello.presentation.product.AddProductScreen
 import br.com.vinheriaagnello.presentation.product.ProductViewModel
 import br.com.vinheriaagnello.presentation.product.ProductViewModelFactory
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import br.com.vinheriaagnello.data.local.WineStoreDatabase
 import br.com.vinheriaagnello.data.repository.ProductRepository
 import br.com.vinheriaagnello.presentation.cart.CartViewModel
 import br.com.vinheriaagnello.presentation.cart.CartScreen
 import br.com.vinheriaagnello.presentation.cart.CartViewModelFactory
+import br.com.vinheriaagnello.data.repository.CartRepository
 import br.com.vinheriaagnello.presentation.product.ProductDetailScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
@@ -30,20 +34,23 @@ fun AppNavGraph(navController: NavHostController) {
             val context = LocalContext.current
 
             val database = remember {
-                br.com.vinheriaagnello.data.local.WineStoreDatabase.getDatabase(context)
+                WineStoreDatabase.getDatabase(context)
             }
-            val repository = remember { br.com.vinheriaagnello.data.repository.ProductRepository(database.productDao()) }
+            val repository = remember { ProductRepository(database.productDao()) }
 
             val viewModel: ProductViewModel = viewModel(
                 factory = ProductViewModelFactory(repository)
             )
 
-            val cartRepository = remember { br.com.vinheriaagnello.data.repository.CartRepository(database.cartItemDao()) }
-            val cartViewModel: br.com.vinheriaagnello.presentation.cart.CartViewModel = viewModel(
-                factory = br.com.vinheriaagnello.presentation.cart.CartViewModelFactory(cartRepository)
+            val cartRepository = remember { CartRepository(database.cartItemDao()) }
+            val cartViewModel: CartViewModel = viewModel(
+                factory = CartViewModelFactory(cartRepository)
             )
 
             val products by viewModel.products.collectAsState()
+            val snackbarHostState = remember { SnackbarHostState() }
+            val scope = rememberCoroutineScope()
+
             HomeScreen(
                 products = products, // depois integraremos com o ViewModel
                 onProductClick = { product ->
@@ -59,24 +66,32 @@ fun AppNavGraph(navController: NavHostController) {
                         quantityInCart = 1
                     )
                     cartViewModel.insert(cartItem)
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Added to cart!")
+                    }
                 },
                 onGoToCartClick = {
                     navController.navigate("cart")
                 },
                 onGoToAdminClick = {
                     navController.navigate("admin/add-product")
-                }
+                },
+                snackbarHostState = snackbarHostState
             )
         }
         composable("product/{productId}") { backStackEntry ->
             val productId = backStackEntry.arguments?.getString("productId")?.toIntOrNull()
             val context = LocalContext.current
-            val database = remember { br.com.vinheriaagnello.data.local.WineStoreDatabase.getDatabase(context) }
-            val productRepository = remember { br.com.vinheriaagnello.data.repository.ProductRepository(database.productDao()) }
-            val cartRepository = remember { br.com.vinheriaagnello.data.repository.CartRepository(database.cartItemDao()) }
+            val database = remember { WineStoreDatabase.getDatabase(context) }
+            val productRepository = remember { ProductRepository(database.productDao()) }
+            val cartRepository = remember { CartRepository(database.cartItemDao()) }
 
-            val productViewModel: br.com.vinheriaagnello.presentation.product.ProductViewModel = viewModel(factory = br.com.vinheriaagnello.presentation.product.ProductViewModelFactory(productRepository))
-            val cartViewModel: br.com.vinheriaagnello.presentation.cart.CartViewModel = viewModel(factory = br.com.vinheriaagnello.presentation.cart.CartViewModelFactory(cartRepository))
+            val productViewModel: ProductViewModel = viewModel(
+                factory = ProductViewModelFactory(productRepository)
+            )
+            val cartViewModel: CartViewModel = viewModel(
+                factory = CartViewModelFactory(cartRepository)
+            )
 
             val products by productViewModel.products.collectAsState()
             val product = products.find { it.id == productId }
@@ -101,12 +116,16 @@ fun AppNavGraph(navController: NavHostController) {
         }
         composable("cart") {
             val context = LocalContext.current
-            val database = remember { br.com.vinheriaagnello.data.local.WineStoreDatabase.getDatabase(context) }
-            val cartRepository = remember { br.com.vinheriaagnello.data.repository.CartRepository(database.cartItemDao()) }
-            val productRepository = remember { br.com.vinheriaagnello.data.repository.ProductRepository(database.productDao()) }
+            val database = remember { WineStoreDatabase.getDatabase(context) }
+            val cartRepository = remember { CartRepository(database.cartItemDao()) }
+            val productRepository = remember { ProductRepository(database.productDao()) }
 
-            val cartViewModel: CartViewModel = viewModel(factory = CartViewModelFactory(cartRepository))
-            val productViewModel: ProductViewModel = viewModel(factory = ProductViewModelFactory(productRepository))
+            val cartViewModel: CartViewModel = viewModel(
+                factory = CartViewModelFactory(cartRepository)
+            )
+            val productViewModel: ProductViewModel = viewModel(
+                factory = ProductViewModelFactory(productRepository)
+            )
 
             CartScreen(
                 cartViewModel = cartViewModel,
@@ -121,9 +140,11 @@ fun AppNavGraph(navController: NavHostController) {
         }
         composable("admin/add-product") {
             val context = LocalContext.current
-            val database = remember { br.com.vinheriaagnello.data.local.WineStoreDatabase.getDatabase(context) }
-            val repository = remember { br.com.vinheriaagnello.data.repository.ProductRepository(database.productDao()) }
-            val viewModel: ProductViewModel = viewModel(factory = ProductViewModelFactory(repository))
+            val database = remember { WineStoreDatabase.getDatabase(context) }
+            val repository = remember { ProductRepository(database.productDao()) }
+            val viewModel: ProductViewModel = viewModel(
+                factory = ProductViewModelFactory(repository)
+            )
 
             AddProductScreen(
                 onProductAdded = {

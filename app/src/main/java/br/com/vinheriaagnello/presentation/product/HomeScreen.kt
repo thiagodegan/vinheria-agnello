@@ -20,7 +20,8 @@ fun HomeScreen(
     onProductClick: (ProductEntity) -> Unit,
     onAddToCartClick: (ProductEntity) -> Unit,
     onGoToCartClick: () -> Unit,
-    onGoToAdminClick: () -> Unit
+    onGoToAdminClick: () -> Unit,
+    snackbarHostState: SnackbarHostState
 ) {
     Scaffold(
         topBar = {
@@ -37,7 +38,8 @@ fun HomeScreen(
             FloatingActionButton(onClick = onGoToCartClick) {
                 Icon(Icons.Filled.ShoppingCart, contentDescription = "Cart")
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         if (products.isEmpty()) {
             Box(
