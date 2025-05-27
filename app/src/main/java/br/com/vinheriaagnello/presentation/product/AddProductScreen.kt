@@ -58,9 +58,14 @@ fun AddProductScreen(
             )
             OutlinedTextField(
                 value = quantity,
-                onValueChange = { quantity = it },
+                onValueChange = { input ->
+                    // Permite apenas números inteiros
+                    val cleanInput = input.filter { it.isDigit() }
+                    quantity = cleanInput
+                },
                 label = { Text("Quantity") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
