@@ -1,9 +1,11 @@
 package br.com.vinheriaagnello.presentation.product
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import br.com.vinheriaagnello.data.local.ProductEntity
 
@@ -45,9 +47,14 @@ fun AddProductScreen(
             )
             OutlinedTextField(
                 value = price,
-                onValueChange = { price = it },
+                onValueChange = { input ->
+                    // Permite apenas números e ponto/vírgula
+                    val cleanInput = input.filter { it.isDigit() || it == '.' || it == ',' }
+                    price = cleanInput
+                },
                 label = { Text("Price") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             OutlinedTextField(
                 value = quantity,
@@ -63,7 +70,7 @@ fun AddProductScreen(
                     val product = ProductEntity(
                         name = name,
                         description = description,
-                        price = price.toDoubleOrNull() ?: 0.0,
+                        price = price.replace(',', '.').toDoubleOrNull() ?: 0.0,
                         quantity = quantity.toIntOrNull() ?: 0
                     )
                     viewModel.insert(product)
