@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 fun CartScreen(
     cartViewModel: CartViewModel,
     productViewModel: br.com.vinheriaagnello.presentation.product.ProductViewModel,
-    onOrderCompleted: () -> Unit
+    onOrderCompleted: () -> Unit,
 ) {
     val cartItems by cartViewModel.cartItems.collectAsState()
     val total by cartViewModel.total.collectAsState()
@@ -56,10 +56,9 @@ fun CartScreen(
                         // Mostra mensagem
                         scope.launch {
                             snackbarHostState.showSnackbar("Order completed successfully!")
+                            // Volta para Home
+                            onOrderCompleted()
                         }
-
-                        // Volta para Home
-                        onOrderCompleted()
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
