@@ -144,7 +144,8 @@ fun AppNavGraph(navController: NavHostController) {
                 productViewModel = productViewModel,
                 onOrderCompleted = {
                     navController.popBackStack()
-                }
+                },
+                onBackClick = { navController.popBackStack() }
             )
         }
         composable("edit-product/{productId}") { backStackEntry ->
